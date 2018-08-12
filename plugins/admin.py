@@ -8,10 +8,7 @@ class Admin:
             'giveop': 'give_op',
             'takeop': 'take_op',
             'givevoice': 'give_voice',
-            'takevoice': 'take_voice',
-            'reload': 'reload_plugin',
-            'load': 'load_plugin',
-            'unload': 'unload_plugin'
+            'takevoice': 'take_voice'
         }
 
     def give_op(self, con, event):
