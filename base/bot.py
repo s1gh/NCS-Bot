@@ -6,11 +6,17 @@ from config.config import config
 from base.helper import Commands
 from base.plugin_loader import PluginLoader
 
+if config['tls']:
+    import ssl
+    from irc.connection import Factory
+
 logger = logging.getLogger('NCSBot')
 
 class NCSBot(irc.bot.SingleServerIRCBot):
     def __init__(self):
+        ssl_factory = Factory(wrapper=ssl.wrap_socket) if config['tls'] else None
         self.loaded_plugins = PluginLoader().get_plugins()
+
         super().__init__(server_list=[(config['server'], config['port']), ], nickname=config['nickname'],
                          realname=config['realname'])
 
@@ -53,10 +59,14 @@ class NCSBot(irc.bot.SingleServerIRCBot):
     def on_welcome(self, connection, event):
         logger.info('Connected to IRC Server!')
 
-        connection.oper('NCS', config['oper_password'])
-        for channel in config['channels']:
-            connection.join(channel)
-            connection.mode(channel, '+o NCS')  # Set OP on self in every channel | BAD SECURITY, FIX THIS!
+        try:
+            connection.oper(config['oper_username'], config['oper_password'])
+            for channel in config['channels']:
+                connection.join(channel)
+                connection.mode(channel, '+o {}'.format(connection.get_nickname()))  # Set OP on self in every channel
+        except Exception as err:
+            logger.error(err)
+            pass
 
         logger.info('Loaded {} plugin(s): {}'.format(len(self.loaded_plugins), ','.join(self.loaded_plugins.keys())))
 
@@ -65,8 +75,7 @@ class NCSBot(irc.bot.SingleServerIRCBot):
 
     def on_mode(self, connection, event):
         # You can't touch me!
-        if event.arguments[0] == '-o' and event.arguments[1] == config['nickname']:  # Bad security! :'(
-            connection.mode(event.target, '+o NCS')
+        connection.mode(event.target, '+o {}'.format(connection.get_nickname()))
 
     def on_privmsg(self, connection, event):
         cmd = event.arguments[0].split(' ')[0][1:]
