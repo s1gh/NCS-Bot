@@ -80,6 +80,7 @@ class NCSBot(irc.bot.SingleServerIRCBot):
     def on_privmsg(self, connection, event):
         cmd = event.arguments[0].split(' ')[0][1:]
         message = event.arguments[0][len(cmd) + 1:].strip()
+        message = message if len(message) > 0 else None
         source = event.source.split('!')[0]
 
         if cmd == 'unload' and len(message) > 0:
@@ -103,7 +104,9 @@ class NCSBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, connection, event):
         plugin = Commands.command(self.loaded_plugins.values(), event.arguments[0].split(' ')[0])
         cmd = event.arguments[0].split(' ')[0][1:]
-        event.message = event.arguments[0][len(cmd) + 1:].strip()
+
+        message = event.arguments[0][len(cmd) + 1:].strip()
+        event.message = message if len(message) > 0 else None
 
         if event.arguments[0].startswith(config['command_prefix']) and plugin is not None:
             try:
