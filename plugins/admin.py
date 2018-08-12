@@ -1,5 +1,4 @@
 from base.helper import UserMode, Logger
-from base.plugin_loader import PluginLoader
 
 class Admin:
     def __init__(self,):
