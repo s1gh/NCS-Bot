@@ -14,8 +14,8 @@ class ExamplePlugin:
         }
 
     def ping(self, con, event):
-        self.logger.info('Logging example from ExamplePlugin!!!')
         con.privmsg(event.target, '!pong')
+        self.logger.info('Logging example from ExamplePlugin!')
 
     def uptime(self, con, event):
         con.privmsg(event.target, 'Current Uptime: {}'.format(Uptime(self.uptime)))
