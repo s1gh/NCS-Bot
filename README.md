@@ -1,1 +1,1 @@
-# NCS-Bot
+# IRC
